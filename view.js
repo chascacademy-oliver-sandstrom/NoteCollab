@@ -1,9 +1,10 @@
 export default class NotesView {
-    constructor(root, { onNoteSelect, onNoteAdd, onNoteEdit, onNoteDelete } = {}) {
+    constructor(root, { onNoteSelect, onNoteAdd, onNoteEdit, onNoteDelete, onNoteStared } = {}) {
         this.root = root;
         this.onNoteSelect = onNoteSelect;
         this.onNoteAdd = onNoteAdd;
         this.onNoteEdit = onNoteEdit;
+        this.onNoteStared = onNoteStared;
         this.onNoteDelete = onNoteDelete;
         this.root.innerHTML = `
             <div class="notes__sidebar">
@@ -21,13 +22,61 @@ export default class NotesView {
             </div>
             <div class="notes__preview">
                 <input class="notes__title" type="text" placeholder="Untitled">
-                <textarea class="notes__body" placeholder="Write something..."> </textarea>
+                <div class="main-content">
+
+                <!--Text editor toolbar-->
+                <div class="notes__body">
+                    <button type="button" class="btn" data-element="bold">
+                        <i class="fa-solid fa-bold"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="italic">
+                        <i class="fa fa-italic"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="underline">
+                        <i class="fa fa-underline"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="insertUnorderedList">
+                        <i class="fa fa-list-ul"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="insertOrderedList">
+                        <i class="fa fa-list-ol"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="createLink">
+                        <i class="fa fa-link"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="justifyLeft">
+                        <i class="fa fa-align-left"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="justifyCenter">
+                        <i class="fa fa-align-center"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="justifyRight">
+                        <i class="fa fa-align-right"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="justifyFull">
+                        <i class="fa fa-align-justify"></i>
+                    </button>
+                    <button type="button" class="btn" data-element="insertImage">
+                        <i class="fa fa-image"></i>
+                    </button>
+                    <!--End of text editor toolbar-->
+                
+                    <!-- Content -->
+                    <div class="content" contenteditable="true"></div>
+                    
+                    <!--End of content-->
+                    <button id="print">Print</button>
+
+                </div> 
+                
+        
+            </div>
             </div>
         `;
 
         const btnAddNote = this.root.querySelector(".notes__add");
         const inpTitle = this.root.querySelector(".notes__title");
-        const inpBody = this.root.querySelector(".notes__body");
+        const inpBody = this.root.querySelector(".notes__body .content");
 
         btnAddNote.addEventListener("click", () => {
             this.onNoteAdd();
@@ -37,16 +86,18 @@ export default class NotesView {
         [inpTitle, inpBody].forEach(inputField => {
             inputField.addEventListener("blur", () => {
                 const updatedTitle = inpTitle.value.trim();
-                const updatedBody = inpBody.value.trim();
+                const updatedBody = inpBody.innerHTML.trim();
 
                 this.onNoteEdit(updatedTitle, updatedBody);
             });
         });
 
+
+
         this.updateNotePreviewVisibility(false);
     }
 
-    _createListItemHTML(id, title, body, updated) {
+    _createListItemHTML(id, title, body, stared, updated) {
         const MAX_BODY_LENGTH = 60;
 
         return `
@@ -59,9 +110,14 @@ export default class NotesView {
                 <div class="notes__small-updated">
                     ${updated.toLocaleString(undefined, { dateStyle: "full", timeStyle: "short" })}
                 </div>
+                <div id="favorite-div">
+                <span class="favorite ${stared ? "make-favorite":""}">&#9734;</span>
+                </div>
             </div>
         `;
     }
+
+    
 
     updateNoteList(notes) {
         const notesListContainer = this.root.querySelector(".notes__list");
@@ -69,8 +125,9 @@ export default class NotesView {
         // Empty list
         notesListContainer.innerHTML = "";
 
-        for (const note of notes) {
-            const html = this._createListItemHTML(note.id, note.title, note.body, new Date(note.updated));
+        for (const note of notes)
+        {
+            const html = this._createListItemHTML(note.id, note.title, note.body, note.stared, new Date(note.updated));
 
             notesListContainer.insertAdjacentHTML("beforeend", html);
         }
@@ -88,12 +145,18 @@ export default class NotesView {
                     this.onNoteDelete(noteListItem.dataset.noteId);
                 }
             });
+            const favBtn = noteListItem.querySelector('.favorite');
+            favBtn.addEventListener('click', () => {
+                this.onNoteStared(noteListItem.dataset.noteId, !favBtn.classList.contains("make-favorite"));
+
+            });
         });
+
     }
 
     updateActiveNote(note) {
         this.root.querySelector(".notes__title").value = note.title;
-        this.root.querySelector(".notes__body").value = note.body;
+        this.root.querySelector(".notes__body .content").innerHTML = note.body;
         this.root.querySelector(".preview").style.display = "none";
 
         this.root.querySelectorAll(".notes__list-item").forEach(noteListItem => {
@@ -107,3 +170,5 @@ export default class NotesView {
         this.root.querySelector(".notes__preview").style.visibility = visible ? "visible" : "hidden";
     }
 }
+
+

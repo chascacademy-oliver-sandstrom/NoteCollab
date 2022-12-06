@@ -19,6 +19,10 @@ body {
     font-family: 'Source Serif Pro', serif;
 }
 
+i {
+    font-family: "Font Awesome 6 Free" !important;
+}
+
 .notes__sidebar {
     border-right: 2px solid #dddddd;
     flex-shrink: 0;
@@ -65,12 +69,13 @@ body {
 
 .notes__small-body {
     padding: 0 10px;
+    font-weight: 100;
 }
 
 .notes__small-updated {
     color: #aaaaaa;
     font-style: italic;
-    text-align: right;
+    text-align: left;
 }
 
 .notes__preview {
@@ -85,6 +90,7 @@ body {
     border: none;
     outline: none;
     width: 100%;
+    
 }
 
 .notes__title {
@@ -133,4 +139,72 @@ body {
 .preview h3, p {
     font-size: 20px;
     margin: 5px;
+}
+
+#favorite-div {
+    text-align: end;
+}
+
+.favorite {
+    opacity: 0.4; 
+    line-height: 1;
+    color: black;
+    font-size: 2rem;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.make-favorite {
+    opacity: 1;
+    color: rgb(255, 213, 0);
+    font-weight: bold;
+}
+
+.favorite:hover {
+    opacity: 1;
+}
+
+.text-editor-header {
+    background-color: #ecf0f1;
+    padding: 5px;
+}
+.text-editor-header .btn {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* Content */
+.content {
+    min-height: 500px;
+    border: 1px solid #5c5d5d;
+    padding: 20px;
+    background-color: white;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .content, .content * {
+        visibility: visible;
+        min-width: 100vw;
+        min-height: 100vh;
+        border: none; 
+    }
+
+    .notes__sidebar {
+        display: none; 
+    }
+
+    @page {
+        size: 210mm 297mm;
+        margin: 0;
+        min-height: 100vh;
+        min-width: 100vw;
+        padding: 0; 
+    }
+
 }

@@ -36,22 +36,21 @@ export default class App {
             onNoteSelect: noteId => {
                 const selectedNote = this.notes.find(note => note.id == noteId);
                 this._setActiveNote(selectedNote);
-                
             },
             onNoteAdd: () => {
                 const newNote = {
                     title: "",
-                    body: ""
+                    body: "",
+                    stared: false
                 };
 
-                NotesAPI.saveNote(newNote);
+                NotesAPI.saveNote(-1, newNote);
                 this._refreshNotes();
             },
             onNoteEdit: (title, body) => {
-                NotesAPI.saveNote({
-                    id: this.activeNote.id,
+                NotesAPI.saveNote(this.activeNote.id, {
                     title,
-                    body
+                    body,
                 });
 
                 this._refreshNotes();
@@ -60,6 +59,13 @@ export default class App {
                 NotesAPI.deleteNote(noteId);
                 this._refreshNotes();
             },
+            onNoteStared: (id, stared) => {
+                NotesAPI.saveNote(id, {
+                    stared
+                });
+                this._refreshNotes();
+            },
         };
     }
 }
+
